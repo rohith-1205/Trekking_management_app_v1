@@ -3,18 +3,13 @@ from flask import Flask, render_template, Blueprint
 from config import Config
 from extensions import db, login_manager
 from models import User
+from routes.auth_routes import auth as auth_bp
 
 # Create stub blueprints for each required role.
 # These will be separated into their own modules/packages in future phases.
-auth = Blueprint('auth', __name__)
 admin = Blueprint('admin', __name__)
 staff = Blueprint('staff', __name__)
 user = Blueprint('user', __name__)
-
-# Stub routes for blueprints so the app runs without route conflicts.
-@auth.route('/login')
-def login():
-    return "Auth Blueprint: Login Page Placeholder"
 
 @admin.route('/dashboard')
 def admin_dashboard():
@@ -54,7 +49,7 @@ def create_app(config_class=Config):
         return User.query.get(int(user_id))
 
     # Register blueprints to categorize routes under separate URL scopes
-    app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(staff, url_prefix='/staff')
     app.register_blueprint(user, url_prefix='/user')
