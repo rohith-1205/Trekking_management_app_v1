@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Guide - {{ trek.name }} - TrekVoyage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden my-5">
+                <!-- Header -->
+                <div class="card-header bg-teal-custom text-white py-4 border-0 text-center">
+                    <i class="bi bi-person-fill-gear fs-1 brand-icon"></i>
+                    <h3 class="fw-bold mt-2 mb-0">Assign Trek Guide</h3>
+                    <p class="text-white-50 small mb-0">Assign an approved and active guide to lead the expedition</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Expedition Summary Card -->
+                    <div class="bg-teal-soft p-3 rounded-3 mb-4 border border-teal-custom border-opacity-10">
+                        <h6 class="fw-bold text-teal-custom text-uppercase small mb-2"><i class="bi bi-info-circle-fill me-1"></i>Expedition Summary</h6>
+                        <h5 class="fw-bold mb-1 text-dark">{{ trek.name }}</h5>
+                        <p class="text-muted small mb-0"><i class="bi bi-geo-alt-fill me-1"></i>{{ trek.location }} &bull; {{ trek.duration_days }} Days</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('admin.assign_staff', trek_id=trek.id) }}">
+                        <!-- Staff Select Dropdown -->
+                        <div class="mb-4">
+                            <label for="assigned_staff_id" class="form-label fw-semibold text-secondary">Select Guide</label>
+                            <select class="form-select py-2" id="assigned_staff_id" name="assigned_staff_id">
+                                <option value="">-- No Guide / Unassigned --</option>
+                                {% for guide in staff_list %}
+                                    <option value="{{ guide.id }}" {% if trek.assigned_staff_id == guide.id %}selected{% endif %}>
+                                        {{ guide.name }} ({{ guide.email }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Only approved guides who are not blacklisted appear in this list.
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-orange-accent px-4 py-2 rounded-pill fw-semibold shadow-sm flex-grow-1">
+                                Save Assignment
+                            </button>
+                            <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-outline-secondary px-4 py-2 rounded-pill flex-grow-1 text-center">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
