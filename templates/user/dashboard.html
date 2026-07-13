@@ -99,8 +99,15 @@
                                     <div class="col-6 mb-2">
                                         <i class="bi bg-transparent bi-clock me-1 text-teal-custom"></i>{{ trek.duration_days }} Days
                                     </div>
-                                    <div class="col-6 mb-2">
-                                        <i class="bi bg-transparent bi-bar-chart me-1 text-teal-custom"></i>{{ trek.difficulty }}
+                                    <div class="col-6 mb-2 d-flex align-items-center">
+                                        <i class="bi bg-transparent bi-bar-chart me-1 text-teal-custom"></i>
+                                        {% if trek.difficulty == 'Easy' %}
+                                            <span class="badge bg-success-soft text-success border border-success border-opacity-25 rounded px-2">Easy</span>
+                                        {% elif trek.difficulty == 'Moderate' %}
+                                            <span class="badge bg-warning-soft text-warning border border-warning border-opacity-25 rounded text-dark px-2">Moderate</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-soft text-danger border border-danger border-opacity-25 rounded px-2">Hard</span>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="mt-auto">

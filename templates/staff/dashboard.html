@@ -51,8 +51,15 @@
                                 <div class="col-6 mb-2">
                                     <i class="bi bi-clock me-1 text-teal-custom"></i><strong>Duration:</strong> {{ item.trek.duration_days }} Days
                                 </div>
-                                <div class="col-6 mb-2">
-                                    <i class="bi bi-bar-chart me-1 text-teal-custom"></i><strong>Difficulty:</strong> {{ item.trek.difficulty }}
+                                <div class="col-6 mb-2 d-flex align-items-center">
+                                    <i class="bi bi-bar-chart me-1 text-teal-custom"></i><strong class="me-1">Difficulty:</strong> 
+                                    {% if item.trek.difficulty == 'Easy' %}
+                                        <span class="badge bg-success-soft text-success border border-success border-opacity-25 px-2 py-0.5 rounded">Easy</span>
+                                    {% elif item.trek.difficulty == 'Moderate' %}
+                                        <span class="badge bg-warning-soft text-warning border border-warning border-opacity-25 rounded text-dark px-2 py-0.5">Moderate</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-soft text-danger border border-danger border-opacity-25 rounded px-2 py-0.5">Hard</span>
+                                    {% endif %}
                                 </div>
                                 <div class="col-6">
                                     <i class="bi bi-calendar-event me-1 text-teal-custom"></i><strong>Starts:</strong> {{ item.trek.start_date.strftime('%d %b %Y') }}

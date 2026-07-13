@@ -23,13 +23,23 @@
                                 <p class="card-text text-muted mb-3"><i class="bi bi-geo-alt-fill text-orange-custom me-1"></i>{{ trek.location }}</p>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <span class="small fw-semibold text-secondary"><i class="bi bi-clock me-1"></i>{{ trek.duration_days }} Days</span>
-                                    {% if trek.status == 'Open' %}
-                                        <span class="badge bg-success">Open</span>
-                                    {% elif trek.status == 'Closed' %}
-                                        <span class="badge bg-danger">Closed</span>
-                                    {% else %}
-                                        <span class="badge bg-warning text-dark">{{ trek.status }}</span>
-                                    {% endif %}
+                                    <div class="d-flex gap-1 align-items-center">
+                                        {% if trek.difficulty == 'Easy' %}
+                                            <span class="badge bg-success-soft text-success border border-success border-opacity-25 rounded px-2">Easy</span>
+                                        {% elif trek.difficulty == 'Moderate' %}
+                                            <span class="badge bg-warning-soft text-warning border border-warning border-opacity-25 rounded text-dark px-2">Mod</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-soft text-danger border border-danger border-opacity-25 rounded px-2">Hard</span>
+                                        {% endif %}
+                                        
+                                        {% if trek.status == 'Open' %}
+                                            <span class="badge bg-success">Open</span>
+                                        {% elif trek.status == 'Closed' %}
+                                            <span class="badge bg-danger">Closed</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">{{ trek.status }}</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
                                 <div class="d-flex gap-2">
                                     <a href="{{ url_for('admin.edit_trek', trek_id=trek.id) }}" class="btn btn-sm btn-outline-teal rounded-pill px-3 flex-grow-1">Edit</a>
