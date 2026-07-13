@@ -79,6 +79,10 @@ def create_trek():
             duration = int(duration_days)
             slots = int(total_slots)
             
+            if duration <= 0 or slots <= 0:
+                flash("Duration and slots must be positive numbers greater than zero.", "danger")
+                return render_template('admin/trek_form.html', guides=guides, trek=None)
+            
             # Staff assignment validation
             staff_id = int(assigned_staff_id) if assigned_staff_id else None
             
@@ -143,6 +147,10 @@ def edit_trek(trek_id):
             
             duration = int(duration_days)
             new_total_slots = int(total_slots)
+            
+            if duration <= 0 or new_total_slots <= 0:
+                flash("Duration and slots must be positive numbers greater than zero.", "danger")
+                return render_template('admin/trek_form.html', guides=guides, trek=trek_item)
             
             # Recalculate available slots based on booked slots count
             booked_slots = len([b for b in trek_item.bookings if b.status == 'Booked'])

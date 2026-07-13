@@ -31,7 +31,10 @@ def create_app(config_class=Config):
     # User loader for Flask-Login (fetches user from SQLite)
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        user_record = User.query.get(int(user_id))
+        if user_record and user_record.status == 'blacklisted':
+            return None
+        return user_record
 
     # Register blueprints to categorize routes under separate URL scopes
     app.register_blueprint(auth_bp, url_prefix='/auth')

@@ -65,10 +65,14 @@ def update_trek(trek_id):
         try:
             available_slots = int(available_slots_str)
             
+            # Count active bookings to calculate remaining capacity
+            booked_count = Booking.query.filter_by(trek_id=trek_item.id, status='Booked').count()
+            max_allowable_slots = trek_item.total_slots - booked_count
+
             # Validation rules:
-            # 1. Available slots cannot exceed total slots
-            if available_slots > trek_item.total_slots:
-                flash(f"Available slots cannot exceed the trek's total slots capacity ({trek_item.total_slots}).", "danger")
+            # 1. Available slots cannot exceed remaining capacity (total_slots - booked_slots)
+            if available_slots > max_allowable_slots:
+                flash(f"Available slots cannot exceed remaining capacity. Maximum allowed: {max_allowable_slots} ({booked_count} slots already booked out of {trek_item.total_slots}).", "danger")
                 return render_template('staff/trek_detail.html', trek=trek_item)
 
             # 2. Available slots cannot be negative
