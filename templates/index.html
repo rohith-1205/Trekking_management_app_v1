@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - TrekVoyage Trekking Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Header Card with gradient and subtle animations -->
+    <div class="hero-card p-5 mb-5 rounded-4 shadow-lg text-white">
+        <div class="row align-items-center py-4">
+            <div class="col-lg-8">
+                <span class="badge bg-orange-accent text-white px-3 py-2 rounded-pill mb-3 text-uppercase fw-semibold tracking-wider">Project Phase 1 Boilerplate</span>
+                <h1 class="display-4 fw-bold mb-3">Trekking Management App V1</h1>
+                <p class="lead text-white-50 mb-4 fs-4">
+                    A beautiful, modular, role-based platform built to manage treks, staff, and participants seamlessly. 
+                    This phase establishes our Flask factory pattern, blueprint layout, and core styling.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-orange-accent btn-lg px-4 py-3 rounded-pill fw-medium shadow">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Test Auth Redirect
+                    </a>
+                    <a href="#blueprints-section" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-medium">
+                        <i class="bi bi-grid-fill me-2"></i>Explore Blueprints
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block text-center">
+                <i class="bi bi-compass text-white-50 display-1" style="font-size: 8rem; filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blueprints Explorer Section -->
+    <div id="blueprints-section" class="mb-5">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Role-Based Blueprints</h2>
+            <p class="text-muted fs-5">Verify that each of the four separate user role blueprints are registered and responding.</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Auth Blueprint -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-3 card-hover-effect">
+                    <div class="card-body p-4 text-center">
+                        <div class="icon-circle bg-teal-soft text-teal-custom mb-3 mx-auto">
+                            <i class="bi bi-lock fs-4"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Authentication</h5>
+                        <p class="card-text text-muted small">Handles register, login, session validation, and password resets.</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-teal w-100 rounded-pill mt-2">Test Route</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Blueprint -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-3 card-hover-effect">
+                    <div class="card-body p-4 text-center">
+                        <div class="icon-circle bg-orange-soft text-orange-custom mb-3 mx-auto">
+                            <i class="bi bi-people fs-4"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">User (Trekker)</h5>
+                        <p class="card-text text-muted small">Allows trekkers to register, book trips, view history, and update profile.</p>
+                        <a href="{{ url_for('user.user_profile') }}" class="btn btn-sm btn-outline-teal w-100 rounded-pill mt-2">Test Route</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Blueprint -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-3 card-hover-effect">
+                    <div class="card-body p-4 text-center">
+                        <div class="icon-circle bg-teal-soft text-teal-custom mb-3 mx-auto">
+                            <i class="bi bi-backpack-fill fs-4"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Trek Staff</h5>
+                        <p class="card-text text-muted small">Allows local guides to update trek statuses, check-ins, and logs.</p>
+                        <a href="{{ url_for('staff.staff_dashboard') }}" class="btn btn-sm btn-outline-teal w-100 rounded-pill mt-2">Test Route</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Blueprint -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm rounded-3 card-hover-effect">
+                    <div class="card-body p-4 text-center">
+                        <div class="icon-circle bg-orange-soft text-orange-custom mb-3 mx-auto">
+                            <i class="bi bi-sliders2 fs-4"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Administrator</h5>
+                        <p class="card-text text-muted small">Full control over users, trek details, database settings, and metrics.</p>
+                        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-sm btn-outline-teal w-100 rounded-pill mt-2">Test Route</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DB and Tech Stack Verification Status -->
+    <div class="bg-white p-4 rounded-4 shadow-sm mb-5">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h4 class="fw-bold mb-2">System Integration Status</h4>
+                <p class="text-muted mb-0">
+                    Database `instance/trekking.db` will automatically initialize upon launching the application context. 
+                    Bootstrap 5 & customized teal/orange theme overrides are properly linked.
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <span class="badge bg-success-soft text-success px-3 py-2 rounded-pill fs-6">
+                    <i class="bi bi-check-circle-fill me-1"></i> Boilerplate Active
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

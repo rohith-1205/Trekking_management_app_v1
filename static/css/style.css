@@ -1,0 +1,159 @@
+/* -------------------------------------------------------------------------- */
+/* TREKVOYAGE CUSTOM STYLESHEET (TEAL & ORANGE PALETTE)                       */
+/* Used to customize and extend Bootstrap 5 elements cleanly using variables.  */
+/* -------------------------------------------------------------------------- */
+
+:root {
+    /* Color Palette */
+    --primary-teal: #0d9488;       /* Vibrant teal for primary actions and brand identity */
+    --primary-teal-dark: #0f766e;  /* Dark teal for hovers and headings */
+    --accent-orange: #f97316;      /* Pop accent orange for CTA buttons and highlights */
+    --accent-orange-dark: #ea580c; /* Dark orange for button hover states */
+    
+    /* Soft Backgrounds for Alerts/Card Headers */
+    --teal-soft: #f0fdfa;          
+    --orange-soft: #fff7ed;        
+    
+    /* Layout & Body colors */
+    --dark-bg: #0f172a;            /* Deep slate dark for footer/dark sections */
+    --light-bg: #f8fafc;           /* Clean slate light gray background */
+    --white: #ffffff;
+    
+    /* Typography */
+    --font-primary: 'Outfit', sans-serif;
+    
+    /* Shadows */
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Base Body Styles */
+body {
+    font-family: var(--font-primary);
+    background-color: var(--light-bg) !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto; /* Ensures footer stays pinned to the bottom on short pages */
+}
+
+/* Custom Navbar Style Override */
+.bg-teal-custom {
+    background-color: var(--primary-teal) !important;
+}
+
+.brand-icon {
+    font-size: 1.6rem;
+    color: var(--accent-orange);
+    transition: transform 0.4s ease;
+}
+
+.navbar:hover .brand-icon {
+    transform: rotate(30deg); /* Playful micro-interaction on brand hover */
+}
+
+.navbar .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 20px;
+    transition: all 0.2s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+    color: var(--white) !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Button Styling */
+.btn-orange-accent {
+    background-color: var(--accent-orange) !important;
+    border-color: var(--accent-orange) !important;
+    color: var(--white) !important;
+    font-weight: 500;
+    transition: all 0.25s ease-in-out !important;
+}
+
+.btn-orange-accent:hover {
+    background-color: var(--accent-orange-dark) !important;
+    border-color: var(--accent-orange-dark) !important;
+    color: var(--white) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3) !important;
+}
+
+.btn-outline-teal {
+    color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+    font-weight: 500;
+    transition: all 0.25s ease-in-out !important;
+}
+
+.btn-outline-teal:hover {
+    color: var(--white) !important;
+    background-color: var(--primary-teal) !important;
+    border-color: var(--primary-teal) !important;
+    transform: translateY(-1px);
+}
+
+/* Hero Section Custom Gradient Layout */
+.hero-card {
+    background: linear-gradient(135deg, var(--primary-teal-dark) 0%, var(--primary-teal) 50%, #14b8a6 100%);
+    border: none;
+    position: relative;
+}
+
+/* Icon circle utility inside blueprints grid */
+.icon-circle {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Soft color utility classes */
+.bg-teal-soft {
+    background-color: var(--teal-soft) !important;
+}
+
+.bg-orange-soft {
+    background-color: var(--orange-soft) !important;
+}
+
+.text-teal-custom {
+    color: var(--primary-teal) !important;
+}
+
+.text-orange-custom {
+    color: var(--accent-orange) !important;
+}
+
+.bg-success-soft {
+    background-color: #d1fae5 !important;
+}
+
+.text-success {
+    color: #065f46 !important;
+}
+
+/* Premium Card custom styles with Hover Scale Animations */
+.card-hover-effect {
+    border: 1px solid rgba(0, 0, 0, 0.03) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    box-shadow: var(--card-shadow) !important;
+}
+
+.card-hover-effect:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--card-shadow-hover) !important;
+}
+
+/* Footer layout custom class */
+.footer {
+    background-color: var(--dark-bg) !important;
+}
