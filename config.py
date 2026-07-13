@@ -17,3 +17,9 @@ class Config:
     
     # Disable event tracking of Flask-SQLAlchemy to save overhead
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Admin Credentials for Seeding (Phase 2)
+    # Stored here and read from environment variables where possible to avoid hardcoded plaintext in scripts
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'admin@trekvoyage.com'
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'AdminPass123!'
+

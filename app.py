@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, Blueprint
 from config import Config
 from extensions import db, login_manager
+from models import User
 
 # Create stub blueprints for each required role.
 # These will be separated into their own modules/packages in future phases.
@@ -47,10 +48,10 @@ def create_app(config_class=Config):
     db.init_app(app)
     login_manager.init_app(app)
 
-    # Stub user loader for Flask-Login context processor (required to avoid 500 error)
+    # User loader for Flask-Login (fetches user from SQLite)
     @login_manager.user_loader
     def load_user(user_id):
-        return None
+        return User.query.get(int(user_id))
 
     # Register blueprints to categorize routes under separate URL scopes
     app.register_blueprint(auth, url_prefix='/auth')
