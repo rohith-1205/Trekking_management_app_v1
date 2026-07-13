@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - TrekVoyage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden my-5">
+                <!-- Header -->
+                <div class="card-header bg-teal-custom text-white py-4 border-0 text-center">
+                    <i class="bi bi-person-circle fs-1 brand-icon"></i>
+                    <h3 class="fw-bold mt-2 mb-0">Profile Settings</h3>
+                    <p class="text-white-50 small mb-0">View or update your personal account details</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{{ url_for('user.profile') }}">
+                        <!-- Name Field -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold text-secondary">Full Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control border-start-0 ps-0" id="name" name="name" required placeholder="John Doe" value="{{ current_user.name }}">
+                            </div>
+                        </div>
+
+                        <!-- Contact Field -->
+                        <div class="mb-3">
+                            <label for="contact" class="form-label fw-semibold text-secondary">Contact Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-telephone"></i></span>
+                                <input type="tel" class="form-control border-start-0 ps-0" id="contact" name="contact" placeholder="10-digit number" value="{{ current_user.contact or '' }}">
+                            </div>
+                        </div>
+
+                        <!-- Email Field (Read Only) -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold text-secondary">Email Address (Non-editable)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope-fill"></i></span>
+                                <input type="email" class="form-control bg-light border-start-0 ps-0 text-muted" id="email" readonly value="{{ current_user.email }}">
+                            </div>
+                            <div class="form-text small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Email addresses are tied to account identity and cannot be edited.
+                            </div>
+                        </div>
+
+                        <!-- Role Field (Read Only) -->
+                        <div class="mb-4">
+                            <label for="role" class="form-label fw-semibold text-secondary">Account Role (Non-editable)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-shield-fill"></i></span>
+                                <input type="text" class="form-control bg-light border-start-0 ps-0 text-muted text-capitalize" id="role" readonly value="{{ current_user.role }}">
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-orange-accent px-4 py-2 rounded-pill fw-semibold shadow-sm flex-grow-1">
+                                Save Profile
+                            </button>
+                            <a href="{{ url_for('user.user_dashboard') }}" class="btn btn-outline-secondary px-4 py-2 rounded-pill flex-grow-1 text-center">
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

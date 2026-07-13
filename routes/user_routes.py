@@ -128,3 +128,84 @@ def book_trek(trek_id):
         db.session.rollback()
         flash("An error occurred while booking the trek. Please try again.", "danger")
         return redirect(url_for('user.list_treks'))
+
+
+@user.route('/bookings')
+@login_required
+@user_required
+def view_bookings():
+    """
+    Render full booking history for the current logged-in trekker.
+    """
+    user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.booking_date.desc()).all()
+    return render_template('user/booking_history.html', bookings=user_bookings)
+
+
+@user.route('/booking/<int:booking_id>/cancel', methods=['POST'])
+@login_required
+@user_required
+def cancel_booking(booking_id):
+    """
+    Cancel an active booking reservation.
+    Updates the booking status to 'Cancelled' and increments available slots on the trek (+1).
+    Restricted strictly to the booking owner.
+    """
+    booking = Booking.query.get_or_404(booking_id)
+
+    # Ownership check: Ensure users can only cancel their own bookings
+    if booking.user_id != current_user.id:
+        abort(403)
+
+    # State check: Only active bookings can be cancelled
+    if booking.status != 'Booked':
+        flash("This booking cannot be cancelled.", "danger")
+        return redirect(url_for('user.view_bookings'))
+
+    try:
+        # Update booking status to Cancelled
+        booking.status = 'Cancelled'
+        
+        # Restore available slot capacity (+1) on the associated trek
+        # Uses min() to guarantee it never exceeds total_slots (overflow protection)
+        trek_item = booking.trek
+        trek_item.available_slots = min(trek_item.available_slots + 1, trek_item.total_slots)
+
+        db.session.commit()
+        flash(f"Your booking for '{trek_item.name}' has been cancelled.", "success")
+    except Exception:
+        db.session.rollback()
+        flash("An error occurred while cancelling your booking.", "danger")
+
+    return redirect(url_for('user.view_bookings'))
+
+
+@user.route('/profile', methods=['GET', 'POST'])
+@login_required
+@user_required
+def profile():
+    """
+    View and edit the trekker's personal profile (Name, Contact).
+    Email and Role are read-only to enforce database integrity and security.
+    """
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        contact = request.form.get('contact', '').strip()
+
+        if not name:
+            flash("Name field cannot be left blank.", "danger")
+            return render_template('user/profile.html')
+
+        try:
+            current_user.name = name
+            current_user.contact = contact
+            db.session.commit()
+            
+            flash("Profile details updated successfully.", "success")
+            return redirect(url_for('user.profile'))
+        except Exception:
+            db.session.rollback()
+            flash("An error occurred while updating your profile.", "danger")
+            return render_template('user/profile.html')
+
+    return render_template('user/profile.html')
+
