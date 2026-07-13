@@ -23,3 +23,24 @@ def admin_required(f):
             
         return f(*args, **kwargs)
     return decorated_function
+
+
+def staff_required(f):
+    """
+    Custom decorator to restrict access to approved guides (staff).
+    Ensures the client is logged in, has role == 'staff', and status == 'approved'.
+    Unauthenticated users are redirected to login, unauthorized users receive a 403.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash("Please sign in to access this page.", "warning")
+            return redirect(url_for('auth.login'))
+        
+        if current_user.role != 'staff' or current_user.status != 'approved':
+            # Return HTTP 403 Forbidden
+            abort(403)
+            
+        return f(*args, **kwargs)
+    return decorated_function
+

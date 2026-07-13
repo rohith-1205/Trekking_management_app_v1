@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Guide Dashboard - TrekVoyage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header banner -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Guide Portal</h1>
+            <p class="text-muted mb-0">Overview of treks assigned to you and participant logs.</p>
+        </div>
+        <div>
+            <span class="badge bg-teal-custom px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-compass-fill me-1"></i> Guide Access
+            </span>
+        </div>
+    </div>
+
+    <!-- Assigned Treks Section -->
+    <h3 class="fw-bold mb-3">Your Assigned Expeditions</h3>
+    
+    {% if trek_stats %}
+        <div class="row g-4">
+            {% for item in trek_stats %}
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden card-hover-effect">
+                        <!-- Card Header showing status badge -->
+                        <div class="card-header bg-teal-custom text-white py-3 border-0 d-flex justify-content-between align-items-center">
+                            <span class="fw-bold tracking-wider fs-6">{{ item.trek.name }}</span>
+                            <span>
+                                {% if item.trek.status == 'Open' %}
+                                    <span class="badge bg-success rounded-pill px-3 py-1">Open</span>
+                                {% elif item.trek.status == 'Closed' %}
+                                    <span class="badge bg-danger rounded-pill px-3 py-1">Closed</span>
+                                {% elif item.trek.status == 'Pending' %}
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-1">Pending</span>
+                                {% elif item.trek.status == 'Completed' %}
+                                    <span class="badge bg-secondary rounded-pill px-3 py-1">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-info rounded-pill px-3 py-1">{{ item.trek.status }}</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <!-- Card Body -->
+                        <div class="card-body p-4">
+                            <p class="text-muted mb-3"><i class="bi bi-geo-alt-fill text-orange-custom me-1"></i>{{ item.trek.location }}</p>
+                            
+                            <div class="row mb-3 font-monospace fs-7 text-secondary">
+                                <div class="col-6 mb-2">
+                                    <i class="bi bi-clock me-1 text-teal-custom"></i><strong>Duration:</strong> {{ item.trek.duration_days }} Days
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <i class="bi bi-bar-chart me-1 text-teal-custom"></i><strong>Difficulty:</strong> {{ item.trek.difficulty }}
+                                </div>
+                                <div class="col-6">
+                                    <i class="bi bi-calendar-event me-1 text-teal-custom"></i><strong>Starts:</strong> {{ item.trek.start_date.strftime('%d %b %Y') }}
+                                </div>
+                                <div class="col-6">
+                                    <i class="bi bi-people-fill me-1 text-teal-custom"></i><strong>Booked:</strong> {{ item.active_bookings_count }} Trekkers
+                                </div>
+                            </div>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-12">
+                                    <div class="progress rounded-pill" style="height: 10px;">
+                                        {% set booked_pct = ((item.trek.total_slots - item.trek.available_slots) / item.trek.total_slots * 100) | int %}
+                                        <div class="progress-bar bg-teal-custom" role="progressbar" style="width: {{ booked_pct }}%;" aria-valuenow="{{ booked_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted d-block mt-1 text-end">Slots: {{ item.trek.available_slots }} left / {{ item.trek.total_slots }} total</small>
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('staff.update_trek', trek_id=item.trek.id) }}" class="btn btn-teal-custom text-white rounded-pill px-3 flex-grow-1 shadow-sm">
+                                    <i class="bi bi-pencil-square me-1"></i>Manage Status
+                                </a>
+                                <a href="{{ url_for('staff.trek_participants', trek_id=item.trek.id) }}" class="btn btn-outline-teal rounded-pill px-3 flex-grow-1">
+                                    <i class="bi bi-people-fill me-1"></i>View Trekkers
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white p-5 rounded-4 shadow-sm text-center text-muted">
+            <i class="bi bi-compass display-1 text-light d-block mb-3"></i>
+            <span class="fs-5 fw-bold text-dark">No treks assigned yet</span>
+            <p class="small text-muted mt-1">Contact the system administrator to assign you to upcoming expeditions.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

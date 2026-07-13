@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Trek - {{ trek.name }} - TrekVoyage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden my-5">
+                <!-- Header -->
+                <div class="card-header bg-teal-custom text-white py-4 border-0 text-center">
+                    <i class="bi bi-gear-fill fs-1 brand-icon"></i>
+                    <h3 class="fw-bold mt-2 mb-0">Update Trek Status</h3>
+                    <p class="text-white-50 small mb-0">Modify remaining seats and lifecycle status for your expedition</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Trek Summary Box -->
+                    <div class="bg-teal-soft p-3 rounded-3 mb-4 border border-teal-custom border-opacity-10">
+                        <h6 class="fw-bold text-teal-custom text-uppercase small mb-2"><i class="bi bi-info-circle-fill me-1"></i>Expedition Overview</h6>
+                        <h5 class="fw-bold mb-1 text-dark">{{ trek.name }}</h5>
+                        <p class="text-muted small mb-0"><i class="bi bi-geo-alt-fill me-1"></i>{{ trek.location }} &bull; {{ trek.duration_days }} Days</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('staff.update_trek', trek_id=trek.id) }}">
+                        
+                        <!-- Available Slots -->
+                        <div class="mb-4">
+                            <label for="available_slots" class="form-label fw-semibold text-secondary">Available Slots Remaining</label>
+                            <input type="number" class="form-control py-2" id="available_slots" name="available_slots" min="0" max="{{ trek.total_slots }}" required value="{{ trek.available_slots }}">
+                            <div class="form-text small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Cannot exceed the maximum total capacity of <strong>{{ trek.total_slots }}</strong> slots.
+                            </div>
+                        </div>
+
+                        <!-- Trek Status -->
+                        <div class="mb-4">
+                            <label for="status" class="form-label fw-semibold text-secondary">Trek Status</label>
+                            <select class="form-select py-2" id="status" name="status" required>
+                                <option value="Pending" {% if trek.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Approved" {% if trek.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                <option value="Open" {% if trek.status == 'Open' %}selected{% endif %}>Open</option>
+                                <option value="Closed" {% if trek.status == 'Closed' %}selected{% endif %}>Closed</option>
+                                <option value="Completed" {% if trek.status == 'Completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                            <div class="form-text small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Set status to <strong>Open</strong> to allow trekkers to book this trip.
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-orange-accent px-4 py-2 rounded-pill fw-semibold shadow-sm flex-grow-1">
+                                Save Updates
+                            </button>
+                            <a href="{{ url_for('staff.staff_dashboard') }}" class="btn btn-outline-secondary px-4 py-2 rounded-pill flex-grow-1 text-center">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
