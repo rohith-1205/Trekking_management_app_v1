@@ -5,31 +5,20 @@ from extensions import db
 from models import User, Trek, Booking
 from routes.utils import admin_required
 
-# Define the admin blueprint
 admin = Blueprint('admin', __name__)
 
 @admin.route('/dashboard')
 @login_required
 @admin_required
 def admin_dashboard():
-    """
-    Administrator Dashboard view.
-    Displays metrics like total treks, total clients (users+staff), and total bookings.
-    """
-    # Count total treks
     total_treks = Trek.query.count()
-    
-    # Count total users (trekkers) and staff (guides), excluding other admins
     total_users_staff = User.query.filter(User.role != 'admin').count()
-    
-    # Count total bookings
     total_bookings = Booking.query.count()
 
     # Query bookings per trek for stats visualization
     chart_labels = []
     chart_data = []
     
-    # Fetch treks ordered by start date to map booking distributions
     all_treks = Trek.query.order_by(Trek.start_date.asc()).all()
     for trek in all_treks:
         chart_labels.append(trek.name)
@@ -50,9 +39,6 @@ def admin_dashboard():
 @login_required
 @admin_required
 def manage_treks():
-    """
-    View to list all treks in a tabular format for administrative management.
-    """
     treks_list = Trek.query.order_by(Trek.start_date.asc()).all()
     return render_template('admin/manage_treks.html', treks=treks_list)
 
@@ -61,10 +47,6 @@ def manage_treks():
 @login_required
 @admin_required
 def create_trek():
-    """
-    Create a new trek in the system.
-    """
-    # Fetch all approved staff (guides) to allow assignment
     guides = User.query.filter_by(role='staff', status='approved').all()
 
     if request.method == 'POST':
@@ -78,28 +60,23 @@ def create_trek():
         start_date_str = request.form.get('start_date', '').strip()
         end_date_str = request.form.get('end_date', '').strip()
 
-        # Input validation
         if not name or not location or not difficulty or not duration_days or not total_slots or not start_date_str or not end_date_str:
             flash("Please fill in all required fields.", "danger")
             return render_template('admin/trek_form.html', guides=guides, trek=None)
 
         try:
-            # Parse date strings into Python date objects
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
             
-            # Type cast numeric inputs
             duration = int(duration_days)
             slots = int(total_slots)
             
             if duration <= 0 or slots <= 0:
-                flash("Duration and slots must be positive numbers greater than zero.", "danger")
+                flash("Duration and slots must be positive numbers.", "danger")
                 return render_template('admin/trek_form.html', guides=guides, trek=None)
             
-            # Staff assignment validation
             staff_id = int(assigned_staff_id) if assigned_staff_id else None
             
-            # Create Trek instance (available_slots starts as total_slots)
             new_trek = Trek(
                 name=name,
                 location=location,
@@ -118,10 +95,10 @@ def create_trek():
             flash(f"Trek '{name}' created successfully!", "success")
             return redirect(url_for('admin.manage_treks'))
 
-        except ValueError as e:
-            flash("Invalid input types. Please check your date and numeric values.", "danger")
+        except ValueError:
+            flash("Invalid inputs. Please verify format.", "danger")
             return render_template('admin/trek_form.html', guides=guides, trek=None)
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             flash("An error occurred while creating the trek.", "danger")
             return render_template('admin/trek_form.html', guides=guides, trek=None)
@@ -133,9 +110,6 @@ def create_trek():
 @login_required
 @admin_required
 def edit_trek(trek_id):
-    """
-    Edit details of an existing trek.
-    """
     trek_item = Trek.query.get_or_404(trek_id)
     guides = User.query.filter_by(role='staff', status='approved').all()
 
@@ -162,10 +136,9 @@ def edit_trek(trek_id):
             new_total_slots = int(total_slots)
             
             if duration <= 0 or new_total_slots <= 0:
-                flash("Duration and slots must be positive numbers greater than zero.", "danger")
+                flash("Duration and slots must be positive numbers.", "danger")
                 return render_template('admin/trek_form.html', guides=guides, trek=trek_item)
             
-            # Recalculate available slots based on booked slots count
             booked_slots = len([b for b in trek_item.bookings if b.status == 'Booked'])
             new_available_slots = new_total_slots - booked_slots
             
@@ -175,7 +148,6 @@ def edit_trek(trek_id):
 
             staff_id = int(assigned_staff_id) if assigned_staff_id else None
 
-            # Update trek properties
             trek_item.name = name
             trek_item.location = location
             trek_item.difficulty = difficulty
@@ -191,10 +163,10 @@ def edit_trek(trek_id):
             flash(f"Trek '{name}' updated successfully!", "success")
             return redirect(url_for('admin.manage_treks'))
 
-        except ValueError as e:
-            flash("Invalid input types. Please verify dates and integers.", "danger")
+        except ValueError:
+            flash("Invalid input formats.", "danger")
             return render_template('admin/trek_form.html', guides=guides, trek=trek_item)
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             flash("An error occurred while updating the trek.", "danger")
             return render_template('admin/trek_form.html', guides=guides, trek=trek_item)
@@ -206,17 +178,13 @@ def edit_trek(trek_id):
 @login_required
 @admin_required
 def delete_trek(trek_id):
-    """
-    Delete a trek from the system.
-    Only triggered via POST requests from safe forms to prevent CSRF/unintended actions.
-    """
     trek_item = Trek.query.get_or_404(trek_id)
     name = trek_item.name
     try:
         db.session.delete(trek_item)
         db.session.commit()
         flash(f"Trek '{name}' has been deleted.", "success")
-    except Exception as e:
+    except Exception:
         db.session.rollback()
         flash("An error occurred while deleting the trek.", "danger")
         
@@ -227,9 +195,6 @@ def delete_trek(trek_id):
 @login_required
 @admin_required
 def manage_staff():
-    """
-    View to list all staff (guides) and manage their approval statuses.
-    """
     staff_list = User.query.filter_by(role='staff').order_by(User.created_at.desc()).all()
     return render_template('admin/manage_staff.html', staff_list=staff_list)
 
@@ -238,17 +203,14 @@ def manage_staff():
 @login_required
 @admin_required
 def approve_staff(staff_id):
-    """
-    Approve a guide's account registration to let them log in and be assigned to treks.
-    """
     staff_member = User.query.filter_by(id=staff_id, role='staff').first_or_404()
     staff_member.status = 'approved'
     try:
         db.session.commit()
-        flash(f"Guide '{staff_member.name}' registration has been approved successfully.", "success")
+        flash(f"Guide '{staff_member.name}' registration approved.", "success")
     except Exception:
         db.session.rollback()
-        flash("An error occurred while approving the guide's account.", "danger")
+        flash("An error occurred during approval.", "danger")
     return redirect(url_for('admin.manage_staff'))
 
 
@@ -256,17 +218,14 @@ def approve_staff(staff_id):
 @login_required
 @admin_required
 def blacklist_staff(staff_id):
-    """
-    Blacklist a guide, preventing them from logging in or handling treks.
-    """
     staff_member = User.query.filter_by(id=staff_id, role='staff').first_or_404()
     staff_member.status = 'blacklisted'
     try:
         db.session.commit()
-        flash(f"Guide '{staff_member.name}' has been blacklisted and suspended.", "warning")
+        flash(f"Guide '{staff_member.name}' has been blacklisted.", "warning")
     except Exception:
         db.session.rollback()
-        flash("An error occurred while blacklisting the guide's account.", "danger")
+        flash("An error occurred.", "danger")
     return redirect(url_for('admin.manage_staff'))
 
 
@@ -274,9 +233,6 @@ def blacklist_staff(staff_id):
 @login_required
 @admin_required
 def manage_users():
-    """
-    View to list all platform users (trekkers) and manage their active statuses.
-    """
     users_list = User.query.filter_by(role='user').order_by(User.created_at.desc()).all()
     return render_template('admin/manage_users.html', users_list=users_list)
 
@@ -285,17 +241,14 @@ def manage_users():
 @login_required
 @admin_required
 def blacklist_user(user_id):
-    """
-    Blacklist a trekker, terminating active sessions and preventing future log-ins.
-    """
     user_member = User.query.filter_by(id=user_id, role='user').first_or_404()
     user_member.status = 'blacklisted'
     try:
         db.session.commit()
-        flash(f"User '{user_member.name}' has been blacklisted and suspended.", "warning")
+        flash(f"User '{user_member.name}' has been blacklisted.", "warning")
     except Exception:
         db.session.rollback()
-        flash("An error occurred while blacklisting the user's account.", "danger")
+        flash("An error occurred.", "danger")
     return redirect(url_for('admin.manage_users'))
 
 
@@ -303,12 +256,7 @@ def blacklist_user(user_id):
 @login_required
 @admin_required
 def assign_staff(trek_id):
-    """
-    Assign a guide (staff member) to lead a specific trek.
-    Restricted to guides that are both approved and not blacklisted.
-    """
     trek_item = Trek.query.get_or_404(trek_id)
-    # Fetch approved and non-blacklisted staff members (guides)
     approved_staff = User.query.filter_by(role='staff', status='approved').order_by(User.name.asc()).all()
 
     if request.method == 'POST':
@@ -319,10 +267,9 @@ def assign_staff(trek_id):
         else:
             try:
                 staff_id = int(staff_id_str)
-                # Verify chosen staff member is valid and authorized
                 staff_member = User.query.filter_by(id=staff_id, role='staff', status='approved').first()
                 if not staff_member:
-                    flash("Unauthorized or invalid guide selected.", "danger")
+                    flash("Invalid guide selected.", "danger")
                     return render_template('admin/assign_staff.html', trek=trek_item, staff_list=approved_staff)
                 
                 trek_item.assigned_staff_id = staff_id
@@ -332,11 +279,11 @@ def assign_staff(trek_id):
 
         try:
             db.session.commit()
-            flash(f"Guide assignment updated successfully for trek '{trek_item.name}'.", "success")
+            flash(f"Guide assignment updated successfully.", "success")
             return redirect(url_for('admin.manage_treks'))
         except Exception:
             db.session.rollback()
-            flash("An error occurred while completing the guide assignment.", "danger")
+            flash("An error occurred while saving guide assignment.", "danger")
 
     return render_template('admin/assign_staff.html', trek=trek_item, staff_list=approved_staff)
 
@@ -345,10 +292,6 @@ def assign_staff(trek_id):
 @login_required
 @admin_required
 def search():
-    """
-    Search platform entities (Treks, Guides, and Trekkers) by name using safe parameterized queries.
-    Prevents SQL injection vulnerabilities.
-    """
     query_str = request.args.get('q', '').strip()
     
     treks_results = []
@@ -356,16 +299,10 @@ def search():
     users_results = []
 
     if query_str:
-        # Construct wildcards securely. SQLAlchemy's .like() compiles to safe placeholders.
         search_pattern = f"%{query_str}%"
         
-        # Query matching treks
         treks_results = Trek.query.filter(Trek.name.like(search_pattern)).all()
-        
-        # Query matching guides (staff role)
         guides_results = User.query.filter(User.role == 'staff', User.name.like(search_pattern)).all()
-        
-        # Query matching trekkers (user role)
         users_results = User.query.filter(User.role == 'user', User.name.like(search_pattern)).all()
 
     return render_template(
