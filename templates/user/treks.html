@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Expeditions - TrekVoyage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header banner -->
+    <div class="mb-4">
+        <h1 class="fw-bold mb-1">Explore Trek Expeditions</h1>
+        <p class="text-muted mb-0">Browse and book active outdoor trekking trips.</p>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 bg-white">
+        <form method="GET" action="{{ url_for('user.list_treks') }}" class="row g-3 align-items-end">
+            <!-- Location search -->
+            <div class="col-md-5">
+                <label for="location" class="form-label fw-semibold text-secondary">Location</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-geo-alt"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" id="location" name="location" placeholder="e.g. Himalayas, Alps..." value="{{ location }}">
+                </div>
+            </div>
+
+            <!-- Difficulty filter -->
+            <div class="col-md-4">
+                <label for="difficulty" class="form-label fw-semibold text-secondary">Difficulty Level</label>
+                <select class="form-select" id="difficulty" name="difficulty">
+                    <option value="" {% if not difficulty %}selected{% endif %}>All Difficulties</option>
+                    <option value="Easy" {% if difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+                    <option value="Moderate" {% if difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
+                    <option value="Hard" {% if difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+                </select>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-teal-custom text-white py-2 rounded-pill shadow-sm flex-grow-1">
+                    <i class="bi bi-filter me-1"></i>Apply Filters
+                </button>
+                <a href="{{ url_for('user.list_treks') }}" class="btn btn-outline-secondary py-2 rounded-pill flex-grow-1 text-center">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Treks Grid -->
+    {% if treks %}
+        <div class="row g-4 mb-5">
+            {% for trek in treks %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden card-hover-effect">
+                        <div class="card-header bg-teal-custom text-white py-3 border-0 d-flex justify-content-between align-items-center">
+                            <span class="fw-bold tracking-wider fs-6">{{ trek.name }}</span>
+                            <!-- Difficulty Badge -->
+                            <span>
+                                {% if trek.difficulty == 'Easy' %}
+                                    <span class="badge bg-success-soft text-success border border-success border-opacity-10 px-2 py-1 rounded">Easy</span>
+                                {% elif trek.difficulty == 'Moderate' %}
+                                    <span class="badge bg-warning-soft text-warning border border-warning border-opacity-10 px-2 py-1 rounded text-dark">Moderate</span>
+                                {% else %}
+                                    <span class="badge bg-danger-soft text-danger border border-danger border-opacity-10 px-2 py-1 rounded">Hard</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="card-body p-4 d-flex flex-column h-100">
+                            <!-- Location -->
+                            <p class="text-muted mb-3"><i class="bi bi-geo-alt-fill text-orange-custom me-1"></i>{{ trek.location }}</p>
+                            
+                            <!-- Trek Meta Details -->
+                            <div class="row mb-3 font-monospace fs-7 text-secondary">
+                                <div class="col-6 mb-2">
+                                    <i class="bi bi-clock me-1 text-teal-custom"></i><strong>Duration:</strong> {{ trek.duration_days }} Days
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <i class="bi bi-people-fill me-1 text-teal-custom"></i><strong>Capacity:</strong> {{ trek.total_slots }} Slots
+                                </div>
+                                <div class="col-12 mb-2">
+                                    <i class="bi bi-calendar-event me-1 text-teal-custom"></i><strong>Starts:</strong> {{ trek.start_date.strftime('%d %b %Y') }}
+                                </div>
+                                <div class="col-12">
+                                    <i class="bi bi-person-fill me-1 text-teal-custom"></i><strong>Guide:</strong> {{ trek.assigned_staff.name if trek.assigned_staff else 'Unassigned' }}
+                                </div>
+                            </div>
+
+                            <!-- Available Slots Indicator -->
+                            <div class="mt-2 mb-4">
+                                <div class="progress rounded-pill" style="height: 8px;">
+                                    {% set booked_pct = ((trek.total_slots - trek.available_slots) / trek.total_slots * 100) | int %}
+                                    <div class="progress-bar bg-teal-custom" role="progressbar" style="width: {{ booked_pct }}%;" aria-valuenow="{{ booked_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <small class="text-muted">Available slots:</small>
+                                    <span class="small fw-bold text-dark">{{ trek.available_slots }} / {{ trek.total_slots }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Booking Actions -->
+                            <div class="mt-auto">
+                                {% if trek.available_slots > 0 %}
+                                    <form action="{{ url_for('user.book_trek', trek_id=trek.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-orange-accent w-100 rounded-pill shadow-sm py-2 fw-semibold">
+                                            <i class="bi bi-calendar-plus me-1"></i>Book Trek Slot
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <button class="btn btn-secondary w-100 rounded-pill py-2 fw-semibold" disabled>
+                                        <i class="bi bi-x-circle me-1"></i>Sold Out
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white p-5 rounded-4 shadow-sm text-center text-muted mb-5">
+            <i class="bi bi-funnel display-1 text-light d-block mb-3"></i>
+            <span class="fs-5 fw-bold text-dark">No matching treks found</span>
+            <p class="small text-muted mt-1">Try resetting your filters or adjusting your search location criteria.</p>
+            <a href="{{ url_for('user.list_treks') }}" class="btn btn-teal-custom text-white px-4 rounded-pill mt-3 shadow-sm">Reset Filters</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

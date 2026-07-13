@@ -44,3 +44,24 @@ def staff_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+def user_required(f):
+    """
+    Custom decorator to restrict access to regular users (trekkers) only.
+    Ensures the client is logged in and has role == 'user'.
+    Unauthenticated users are redirected to login, unauthorized users receive a 403.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash("Please sign in to access this page.", "warning")
+            return redirect(url_for('auth.login'))
+        
+        if current_user.role != 'user':
+            # Return HTTP 403 Forbidden
+            abort(403)
+            
+        return f(*args, **kwargs)
+    return decorated_function
+
+

@@ -6,14 +6,7 @@ from models import User
 from routes.auth_routes import auth as auth_bp
 from routes.admin_routes import admin as admin_bp
 from routes.staff_routes import staff as staff_bp
-
-# Create stub blueprints for each required role.
-# These will be separated into their own modules/packages in future phases.
-user = Blueprint('user', __name__)
-
-@user.route('/profile')
-def user_profile():
-    return "User Blueprint: Profile Placeholder"
+from routes.user_routes import user as user_bp
 
 
 def create_app(config_class=Config):
@@ -44,7 +37,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(staff_bp, url_prefix='/staff')
-    app.register_blueprint(user, url_prefix='/user')
+    app.register_blueprint(user_bp, url_prefix='/user')
 
     # Define a minimal root route that serves the welcome screen
     @app.route('/')

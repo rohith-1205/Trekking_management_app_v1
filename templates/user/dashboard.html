@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - TrekVoyage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header banner -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">My Dashboard</h1>
+            <p class="text-muted mb-0">Manage your trek bookings and explore new expeditions.</p>
+        </div>
+        <div>
+            <span class="badge bg-teal-custom px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-backpack-fill me-1"></i> Trekker Access
+            </span>
+        </div>
+    </div>
+
+    <!-- Booked Treks Table Card -->
+    <h3 class="fw-bold mb-3">Your Booked Expeditions</h3>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase font-monospace fs-7 text-secondary">
+                    <tr>
+                        <th class="ps-4">Booking ID</th>
+                        <th>Trek Name</th>
+                        <th>Location</th>
+                        <th>Dates</th>
+                        <th>Duration</th>
+                        <th>Guide / Leader</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if bookings %}
+                        {% for booking in bookings %}
+                            <tr>
+                                <td class="ps-4 text-muted">#{{ booking.id }}</td>
+                                <td><span class="fw-bold text-teal-custom">{{ booking.trek.name }}</span></td>
+                                <td><i class="bi bi-geo-alt-fill text-orange-custom me-1"></i>{{ booking.trek.location }}</td>
+                                <td>
+                                    <small class="text-muted d-block">Start: {{ booking.trek.start_date.strftime('%d %b %Y') }}</small>
+                                    <small class="text-muted d-block">End: {{ booking.trek.end_date.strftime('%d %b %Y') }}</small>
+                                </td>
+                                <td>{{ booking.trek.duration_days }} Days</td>
+                                <td>
+                                    {% if booking.trek.assigned_staff %}
+                                        <span class="small fw-semibold text-secondary"><i class="bi bi-person-fill text-muted me-1"></i>{{ booking.trek.assigned_staff.name }}</span>
+                                    {% else %}
+                                        <span class="text-muted small italic">Guide Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if booking.status == 'Booked' %}
+                                        <span class="badge bg-success rounded-pill px-3 py-2">Confirmed / Booked</span>
+                                    {% elif booking.status == 'Cancelled' %}
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">Cancelled</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary rounded-pill px-3 py-2">{{ booking.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-backpack display-1 text-light d-block mb-3"></i>
+                                <span class="fs-5 fw-bold">You haven't booked any treks yet</span>
+                                <p class="small text-muted mt-1">Browse our list of expeditions and book your next adventure today!</p>
+                                <a href="{{ url_for('user.list_treks') }}" class="btn btn-teal-custom text-white px-4 rounded-pill mt-3 shadow-sm">Explore Open Treks</a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Open Treks Quick View -->
+    {% if open_treks %}
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Feature Expeditions</h3>
+                <a href="{{ url_for('user.list_treks') }}" class="text-teal-custom fw-semibold text-decoration-none">View All Treks <i class="bi bi-arrow-right"></i></a>
+            </div>
+            
+            <div class="row g-4">
+                {% for trek in open_treks %}
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden card-hover-effect">
+                            <div class="card-header bg-teal-custom text-white py-3 border-0">
+                                <span class="fw-bold tracking-wider fs-6">{{ trek.name }}</span>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column h-100">
+                                <p class="text-muted mb-3"><i class="bi bi-geo-alt-fill text-orange-custom me-1"></i>{{ trek.location }}</p>
+                                <div class="row mb-3 font-monospace fs-7 text-secondary">
+                                    <div class="col-6 mb-2">
+                                        <i class="bi bg-transparent bi-clock me-1 text-teal-custom"></i>{{ trek.duration_days }} Days
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <i class="bi bg-transparent bi-bar-chart me-1 text-teal-custom"></i>{{ trek.difficulty }}
+                                    </div>
+                                </div>
+                                <div class="mt-auto">
+                                    <form action="{{ url_for('user.book_trek', trek_id=trek.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-orange-accent w-100 rounded-pill shadow-sm py-2 fw-semibold">
+                                            <i class="bi bi-calendar-check me-1"></i>Book Slot ({{ trek.available_slots }} left)
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
