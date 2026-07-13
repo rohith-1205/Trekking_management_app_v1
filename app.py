@@ -4,16 +4,12 @@ from config import Config
 from extensions import db, login_manager
 from models import User
 from routes.auth_routes import auth as auth_bp
+from routes.admin_routes import admin as admin_bp
 
 # Create stub blueprints for each required role.
 # These will be separated into their own modules/packages in future phases.
-admin = Blueprint('admin', __name__)
 staff = Blueprint('staff', __name__)
 user = Blueprint('user', __name__)
-
-@admin.route('/dashboard')
-def admin_dashboard():
-    return "Admin Blueprint: Dashboard Placeholder"
 
 @staff.route('/dashboard')
 def staff_dashboard():
@@ -50,7 +46,7 @@ def create_app(config_class=Config):
 
     # Register blueprints to categorize routes under separate URL scopes
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(admin, url_prefix='/admin')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(staff, url_prefix='/staff')
     app.register_blueprint(user, url_prefix='/user')
 

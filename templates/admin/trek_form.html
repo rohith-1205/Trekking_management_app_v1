@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}{% if trek %}Edit Trek - {{ trek.name }}{% else %}Add New Trek{% endif %} - TrekVoyage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden my-4">
+                <!-- Dynamic Header -->
+                <div class="card-header bg-teal-custom text-white py-4 border-0 text-center">
+                    <i class="bi {% if trek %}bi-pencil-square{% else %}bi-plus-circle{% endif %} fs-1 brand-icon"></i>
+                    <h3 class="fw-bold mt-2 mb-0">{% if trek %}Edit Trek Details{% else %}Add New Trek{% endif %}</h3>
+                    <p class="text-white-50 small mb-0">{% if trek %}Modify fields to update '#{{ trek.id }} {{ trek.name }}'{% else %}Fill out the fields to publish a new trek trip{% endif %}</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Form Action selects Create vs Edit endpoints dynamically -->
+                    <form method="POST" action="{% if trek %}{{ url_for('admin.edit_trek', trek_id=trek.id) }}{% else %}{{ url_for('admin.create_trek') }}{% endif %}">
+                        
+                        <!-- Trek Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold text-secondary">Trek Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="e.g. Roopkund Trail Expedition" value="{% if trek %}{{ trek.name }}{% endif %}">
+                        </div>
+
+                        <div class="row">
+                            <!-- Location -->
+                            <div class="col-md-6 mb-3">
+                                <label for="location" class="form-label fw-semibold text-secondary">Location *</label>
+                                <input type="text" class="form-control" id="location" name="location" required placeholder="e.g. Uttarakhand, India" value="{% if trek %}{{ trek.location }}{% endif %}">
+                            </div>
+                            
+                            <!-- Difficulty Level -->
+                            <div class="col-md-6 mb-3">
+                                <label for="difficulty" class="form-label fw-semibold text-secondary">Difficulty Level *</label>
+                                <select class="form-select" id="difficulty" name="difficulty" required>
+                                    <option value="" disabled {% if not trek %}selected{% endif %}>Select difficulty...</option>
+                                    <option value="Easy" {% if trek and trek.difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+                                    <option value="Moderate" {% if trek and trek.difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
+                                    <option value="Hard" {% if trek and trek.difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Duration -->
+                            <div class="col-md-6 mb-3">
+                                <label for="duration_days" class="form-label fw-semibold text-secondary">Duration (Days) *</label>
+                                <input type="number" class="form-control" id="duration_days" name="duration_days" min="1" required placeholder="e.g. 5" value="{% if trek %}{{ trek.duration_days }}{% endif %}">
+                            </div>
+
+                            <!-- Total Slots -->
+                            <div class="col-md-6 mb-3">
+                                <label for="total_slots" class="form-label fw-semibold text-secondary">Total Slots *</label>
+                                <input type="number" class="form-control" id="total_slots" name="total_slots" min="1" required placeholder="e.g. 20" value="{% if trek %}{{ trek.total_slots }}{% endif %}">
+                                {% if trek %}
+                                    <small class="text-muted">Currently available: {{ trek.available_slots }} slots.</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Start Date -->
+                            <div class="col-md-6 mb-3">
+                                <label for="start_date" class="form-label fw-semibold text-secondary">Start Date *</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required value="{% if trek %}{{ trek.start_date.strftime('%Y-%m-%d') }}{% endif %}">
+                            </div>
+
+                            <!-- End Date -->
+                            <div class="col-md-6 mb-3">
+                                <label for="end_date" class="form-label fw-semibold text-secondary">End Date *</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" required value="{% if trek %}{{ trek.end_date.strftime('%Y-%m-%d') }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Assigned Guide (Staff) -->
+                            <div class="col-md-6 mb-3">
+                                <label for="assigned_staff_id" class="form-label fw-semibold text-secondary">Assigned Guide (Approved Staff)</label>
+                                <select class="form-select" id="assigned_staff_id" name="assigned_staff_id">
+                                    <option value="">-- Unassigned / No Guide --</option>
+                                    {% for guide in guides %}
+                                        <option value="{{ guide.id }}" {% if trek and trek.assigned_staff_id == guide.id %}selected{% endif %}>{{ guide.name }} ({{ guide.email }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Trek Status -->
+                            <div class="col-md-6 mb-4">
+                                <label for="status" class="form-label fw-semibold text-secondary">Trek Lifecycle Status *</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <!-- New treks default to Pending -->
+                                    <option value="Pending" {% if not trek or (trek and trek.status == 'Pending') %}selected{% endif %}>Pending</option>
+                                    <option value="Approved" {% if trek and trek.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                    <option value="Open" {% if trek and trek.status == 'Open' %}selected{% endif %}>Open</option>
+                                    <option value="Closed" {% if trek and trek.status == 'Closed' %}selected{% endif %}>Closed</option>
+                                    <option value="Completed" {% if trek and trek.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Action buttons -->
+                        <div class="d-flex gap-3 mt-2">
+                            <button type="submit" class="btn btn-orange-accent px-4 py-3 rounded-pill fw-semibold shadow-sm flex-grow-1">
+                                <i class="bi bi-cloud-arrow-up-fill me-1"></i>{% if trek %}Save Changes{% else %}Create Trek{% endif %}
+                            </button>
+                            <a href="{{ url_for('admin.manage_treks') }}" class="btn btn-outline-secondary px-4 py-3 rounded-pill flex-grow-1 text-center">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
