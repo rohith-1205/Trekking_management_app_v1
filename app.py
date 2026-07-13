@@ -7,6 +7,7 @@ from routes.auth_routes import auth as auth_bp
 from routes.admin_routes import admin as admin_bp
 from routes.staff_routes import staff as staff_bp
 from routes.user_routes import user as user_bp
+from routes.api_routes import api as api_bp
 
 
 def create_app(config_class=Config):
@@ -41,6 +42,7 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(staff_bp, url_prefix='/staff')
     app.register_blueprint(user_bp, url_prefix='/user')
+    app.register_blueprint(api_bp, url_prefix='/api')
 
     # Define a minimal root route that serves the welcome screen
     @app.route('/')

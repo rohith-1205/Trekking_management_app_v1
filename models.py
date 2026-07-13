@@ -43,6 +43,21 @@ class User(db.Model, UserMixin):
         """
         return check_password_hash(self.password_hash, password)
 
+    def to_dict(self):
+        """
+        Serializes user attributes to a standard Python dictionary.
+        Excludes sensitive data like the password hash.
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'role': self.role,
+            'status': self.status,
+            'contact': self.contact,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
     def __repr__(self):
         return f"<User {self.email} ({self.role})>"
 
@@ -77,6 +92,25 @@ class Trek(db.Model):
     # A trek can have multiple bookings
     bookings = db.relationship('Booking', backref='trek', lazy=True, cascade="all, delete-orphan")
 
+    def to_dict(self):
+        """
+        Serializes trek attributes to a standard Python dictionary.
+        Converts dates to ISO formats for JSON compatibility.
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+            'location': self.location,
+            'difficulty': self.difficulty,
+            'duration_days': self.duration_days,
+            'available_slots': self.available_slots,
+            'total_slots': self.total_slots,
+            'assigned_staff_id': self.assigned_staff_id,
+            'status': self.status,
+            'start_date': self.start_date.isoformat() if self.start_date else None,
+            'end_date': self.end_date.isoformat() if self.end_date else None
+        }
+
     def __repr__(self):
         return f"<Trek {self.name} at {self.location}>"
 
@@ -99,6 +133,24 @@ class Booking(db.Model):
     
     # Booking status: 'Booked', 'Cancelled', 'Completed'
     status = db.Column(db.String(20), nullable=False, default='Booked')
+
+    def to_dict(self):
+        """
+        Serializes booking attributes to a standard Python dictionary,
+        including nested key-value pairs representing trek meta-information.
+        """
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'trek_id': self.trek_id,
+            'booking_date': self.booking_date.isoformat() if self.booking_date else None,
+            'status': self.status,
+            'trek': {
+                'name': self.trek.name if self.trek else None,
+                'location': self.trek.location if self.trek else None,
+                'start_date': self.trek.start_date.isoformat() if self.trek and self.trek.start_date else None
+            }
+        }
 
     def __repr__(self):
         return f"<Booking {self.id} for User {self.user_id} on Trek {self.trek_id}>"

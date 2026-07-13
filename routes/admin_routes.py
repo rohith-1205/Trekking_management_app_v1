@@ -25,11 +25,24 @@ def admin_dashboard():
     # Count total bookings
     total_bookings = Booking.query.count()
 
+    # Query bookings per trek for stats visualization
+    chart_labels = []
+    chart_data = []
+    
+    # Fetch treks ordered by start date to map booking distributions
+    all_treks = Trek.query.order_by(Trek.start_date.asc()).all()
+    for trek in all_treks:
+        chart_labels.append(trek.name)
+        active_bookings_count = Booking.query.filter_by(trek_id=trek.id, status='Booked').count()
+        chart_data.append(active_bookings_count)
+
     return render_template(
         'admin/dashboard.html',
         total_treks=total_treks,
         total_users_staff=total_users_staff,
-        total_bookings=total_bookings
+        total_bookings=total_bookings,
+        chart_labels=chart_labels,
+        chart_data=chart_data
     )
 
 
